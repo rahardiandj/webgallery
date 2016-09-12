@@ -5,10 +5,14 @@
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
+var morgan     = require('morgan');         //log module
 
+var jwt        = require('jsonwebtoken');
+var config     = require('./config');
 //Connect to mongodb
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/webgallery');
+mongoose.connect(config.database);
+app.set('superSecret', config.secret);
 
 //Models
 var User = require('./models/user');
@@ -17,6 +21,8 @@ var User = require('./models/user');
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(morgan('dev'));
 
 var port = process.env.PORT || 8080;        // set our port
 
@@ -34,12 +40,15 @@ router.route('/users')
     var user = new User();
     user.email = req.body.email;
     user.password = req.body.password;
+    user.admin = req.body.admin;
 
     user.save(function(err){
       if (err)
         res.send(err);
-      res.json({message: req.body.email + ' created!'});
+      res.json({message: 'email : ' + user.email +
+        'pass : ' + user.password+ ' admin : ' + user.admin});
     });
+
   })
 
   .get(function(req, res){
