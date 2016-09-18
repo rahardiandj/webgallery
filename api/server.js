@@ -12,7 +12,9 @@ var config     = require('./config');
 //Connect to mongodb
 var mongoose = require('mongoose');
 
-var dbURI = config.database; 
+var dbURI = config.database;
+
+
 
 // Create the database connection
 mongoose.connect(dbURI);
@@ -48,13 +50,16 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 var port = process.env.PORT || 8080;        // set our port
-
+var image = require('./routes/image');
+var user = require('./routes/user');
 
 
 // ROUTES FOR OUR API
 // =============================================================================
 var router = express.Router();              // get an instance of the express Router
 app.use('/api', router);
+
+router.get('/images', image.list);
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
@@ -70,7 +75,6 @@ router.route('/authenticate')
 
       if (!user){
         res.json({success:false, message:'Authentication Failed! Username not found'})
-
       } else if (user){
         if (user.password != req.body.password){
           res.json({success:false, message: 'Authentication Failed! Password is incorrect'})
@@ -89,9 +93,7 @@ router.route('/authenticate')
     })
   });
 
-
 router.use(function(req, res, next){
-  console.log(req.headers);
   //check token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
@@ -115,28 +117,9 @@ router.use(function(req, res, next){
   next();
 });
 
-router.route('/users')
-  .post(function(req, res){
-    var user = new User();
-    user.email = req.body.email;
-    user.password = req.body.password;
-    user.admin = req.body.admin;
-
-    user.save(function(err){
-      if (err)
-        res.send(err);
-      res.json({message: 'email : ' + user.email +
-        'pass : ' + user.password+ ' admin : ' + user.admin});
-    });
-
-  })
-
-  .get(function(req, res){
-    User.find({}, function(err,users){
-      res.json(users);
-    });
-  });
-
+//router for users in ./routes/user.js
+router.get('/users', user.list);
+router.post('/users', user.create);
 
 
 // more routes for our API will happen here
