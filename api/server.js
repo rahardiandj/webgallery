@@ -49,7 +49,7 @@ app.use(bodyParser.json());
 
 app.use(morgan('dev'));
 
-var port = process.env.PORT || 8080;        // set our port
+var port = process.env.PORT || 8081;        // set our port
 var image = require('./routes/image');
 var user = require('./routes/user');
 
