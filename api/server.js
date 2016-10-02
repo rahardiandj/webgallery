@@ -1,7 +1,5 @@
 //server.js
 //BASE SETUP
-
-
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
@@ -11,10 +9,7 @@ var jwt        = require('jsonwebtoken');
 var config     = require('./config');
 //Connect to mongodb
 var mongoose = require('mongoose');
-
 var dbURI = config.database;
-
-
 
 // Create the database connection
 mongoose.connect(dbURI);
@@ -41,6 +36,7 @@ app.set('superSecret', config.secret);
 
 //Models
 var User = require('./models/user');
+var User = require('./models/image');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -60,6 +56,7 @@ var router = express.Router();              // get an instance of the express Ro
 app.use('/api', router);
 
 router.get('/images', image.list);
+router.post('/images', image.create);
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
